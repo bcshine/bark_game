@@ -156,7 +156,7 @@ const elements = {
     gradeIcon: document.querySelector('.grade-icon'),
     gradeTitle: document.querySelector('.grade-title'),
     couponBtn: document.getElementById('coupon-btn'),
-    retryBtn: document.getElementById('retry-btn'),
+
     homeBtn: document.getElementById('home-btn'),
     saveCouponBtn: document.getElementById('save-coupon-btn'),
     homeFromCouponBtn: document.getElementById('home-from-coupon-btn'),
@@ -175,7 +175,7 @@ function initializeEventListeners() {
             goHome();
         }, 1000);
     });
-    elements.retryBtn.addEventListener('click', resetGame);
+
     elements.homeBtn.addEventListener('click', goHome);
     elements.saveCouponBtn.addEventListener('click', saveCoupon);
     elements.homeFromCouponBtn.addEventListener('click', goHome);
@@ -552,6 +552,18 @@ function showFailAnimation() {
 // 쿠폰 화면 표시
 function showCouponScreen() {
     showScreen('coupon');
+    
+    // 모바일 기기에서는 버튼 텍스트 변경
+    const saveCouponBtn = document.getElementById('save-coupon-btn');
+    if (isMobileDevice() && saveCouponBtn) {
+        saveCouponBtn.innerHTML = '📱 쿠폰 이미지 보기';
+    }
+}
+
+// 모바일 기기 감지 함수
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
 }
 
 // 쿠폰 저장 및 다운로드
@@ -667,24 +679,138 @@ function generateCouponHTML() {
     
     // 캔버스를 이미지로 변환하여 다운로드
     canvas.toBlob(function(blob) {
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = '강아지_간식_쿠폰_' + now.getTime() + '.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
+        const dataURL = canvas.toDataURL('image/png');
         
-        alert('🎉 강아지 간식 쿠폰 이미지가 다운로드되었습니다!\n다운로드 폴더에서 PNG 파일을 확인해주세요!');
+        if (isMobileDevice()) {
+            // 모바일에서는 새 창으로 이미지를 열어서 사용자가 직접 저장하도록 함
+            const newWindow = window.open();
+            if (newWindow) {
+                newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>강아지 간식 쿠폰</title>
+                        <style>
+                            body {
+                                margin: 0;
+                                padding: 20px;
+                                font-family: 'Noto Sans KR', sans-serif;
+                                background: #f8f9fa;
+                                text-align: center;
+                            }
+                            .instruction {
+                                background: #fff;
+                                padding: 20px;
+                                border-radius: 10px;
+                                margin-bottom: 20px;
+                                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                            }
+                            .coupon-image {
+                                max-width: 100%;
+                                height: auto;
+                                border-radius: 10px;
+                                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+                            }
+                            .save-instruction {
+                                margin-top: 20px;
+                                padding: 15px;
+                                background: #e3f2fd;
+                                border-radius: 8px;
+                                border-left: 4px solid #2196f3;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="instruction">
+                            <h2>🎉 강아지 간식 쿠폰이 생성되었습니다!</h2>
+                            <p>아래 이미지를 길게 눌러서 저장해주세요.</p>
+                        </div>
+                        <img src="${dataURL}" alt="강아지 간식 쿠폰" class="coupon-image">
+                        <div class="save-instruction">
+                            <strong>📱 모바일에서 저장하는 방법:</strong><br>
+                            1. 위 쿠폰 이미지를 길게 눌러주세요<br>
+                            2. "이미지 저장" 또는 "사진에 저장"을 선택해주세요<br>
+                            3. 갤러리나 사진 앱에서 확인하실 수 있습니다
+                        </div>
+                    </body>
+                    </html>
+                `);
+                newWindow.document.close();
+                
+                // 안내 메시지
+                setTimeout(() => {
+                    alert('📱 새 창에서 쿠폰 이미지를 길게 눌러서 저장해주세요!\n갤러리나 사진 앱에서 확인하실 수 있습니다.');
+                }, 500);
+                
+            } else {
+                // 팝업이 차단된 경우 대체 방법
+                fallbackMobileSave(dataURL);
+            }
+        } else {
+            // 데스크톱에서는 기존 방식 사용
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '강아지_간식_쿠폰_' + now.getTime() + '.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+            
+            alert('🎉 강아지 간식 쿠폰 이미지가 다운로드되었습니다!\n다운로드 폴더에서 PNG 파일을 확인해주세요!');
+        }
     }, 'image/png');
 }
 
-// 게임 리셋
-function resetGame() {
-    resetGameState();
-    showScreen('quiz');
-    loadQuestion();
+// 모바일에서 팝업이 차단된 경우 대체 저장 방법
+function fallbackMobileSave(dataURL) {
+    // 현재 페이지에 모달로 이미지 표시
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        box-sizing: border-box;
+    `;
+    
+    modal.innerHTML = `
+        <div style="background: white; padding: 20px; border-radius: 15px; text-align: center; max-width: 90%; max-height: 90%; overflow-y: auto;">
+            <h2 style="color: #333; margin-bottom: 15px;">🎉 쿠폰이 생성되었습니다!</h2>
+            <p style="color: #666; margin-bottom: 20px;">아래 이미지를 길게 눌러서 저장해주세요</p>
+            <img src="${dataURL}" alt="강아지 간식 쿠폰" style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+            <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196f3; text-align: left;">
+                <strong>📱 저장 방법:</strong><br>
+                1. 위 쿠폰 이미지를 길게 눌러주세요<br>
+                2. "이미지 저장" 또는 "사진에 저장"을 선택해주세요<br>
+                3. 갤러리나 사진 앱에서 확인하실 수 있습니다
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 20px; padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 25px; font-size: 16px; cursor: pointer;">닫기</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // 모달 배경 클릭시 닫기
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+    
+    alert('📱 이미지를 길게 눌러서 저장해주세요!\n갤러리나 사진 앱에서 확인하실 수 있습니다.');
 }
+
+
 
 // 홈으로 가기
 function goHome() {
