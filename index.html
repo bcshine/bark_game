@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐾 강아지 마음을을 맞춰보아요</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 시작 화면 -->
+    <div id="start-screen" class="screen active">
+        <div class="container">
+            <h1>🐾 강아지 마음을 맞춰보아요🐾</h1>
+            <div class="dog-animation">
+                <img src="assets/puppy.png" alt="강아지" class="puppy-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <div class="dog">🐕</div>
+                <div class="bark-bubble">멍멍!</div>
+            </div>
+                        <p class="subtitle">강아지가 뭐라고 말하는 걸까요?</p>
+            <p class="company">*견체공학 강아지 음성 공학 연구소*</p>
+            <button id="start-btn" class="btn-primary">▶️ 시작하기</button>
+        </div>
+    </div>
+
+    <!-- 퀴즈 화면 -->
+    <div id="quiz-screen" class="screen">
+        <div class="container">
+            <div class="quiz-header">
+                <h2>강아지 언어를 맞춰보세요!</h2>
+                <div class="score">도전 중...</div>
+            </div>
+            
+            <div class="sound-section">
+                <img src="assets/puppy.png" alt="강아지" class="puppy-speaking" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <div class="dog-speaking">🐕💬</div>
+                <button id="play-sound-btn" class="sound-btn">🔊 강아지 소리 듣기</button>
+                <audio id="dog-sound" preload="auto"></audio>
+            </div>
+
+            <div class="choices-section">
+                <h3 id="question-text">강아지가 뭐라고 말하는 것 같나요?</h3>
+                <div id="choices-container" class="choices">
+                    <button class="choice-btn" data-answer="0">배고파요</button>
+                    <button class="choice-btn" data-answer="1">산책가요</button>
+                    <button class="choice-btn" data-answer="2">놀아줘요</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 피드백 화면 -->
+    <div id="feedback-screen" class="screen">
+        <div class="container">
+            <div id="feedback-content">
+                <div class="feedback-icon"></div>
+                <h2 class="feedback-title"></h2>
+                <p class="feedback-message"></p>
+                <button id="next-btn" class="btn-primary">결과 보기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 결과 화면 -->
+    <div id="result-screen" class="screen">
+        <div class="container">
+            <h2>게임 완료!</h2>
+            <div class="result-content">
+                <p class="final-score">결과: <span id="final-score-num">0</span>/1</p>
+                <div id="grade-section">
+                    <div class="grade-icon"></div>
+                    <h3 class="grade-title"></h3>
+                </div>
+                <div class="result-buttons">
+                    <button id="coupon-btn" class="btn-primary" style="display: none;">🎁 쿠폰 받기</button>
+                    <button id="retry-btn" class="btn-secondary">🔄 다시 도전</button>
+                    <button id="home-btn" class="btn-secondary">🏠 홈으로</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 쿠폰 화면 -->
+    <div id="coupon-screen" class="screen">
+        <div class="container">
+            <div class="coupon-celebration">
+                <div class="fireworks"></div>
+                <h2>🎉 축하합니다!</h2>
+                <div class="coupon">
+                    <div class="coupon-header">🎁 축하 쿠폰 🎁</div>
+                    <div class="coupon-body">
+                        <p>🦴 강아지 간식 쿠폰 🦴</p>
+                        <p>게임 성공 기념!</p>
+                        <p>유효기간: 2025. 7. 22.</p>
+                    </div>
+                    <div class="coupon-footer">견체공학 강아지 음성 공학 연구소</div>
+                </div>
+                <div class="coupon-buttons">
+                    <button id="save-coupon-btn" class="btn-primary">✅ 쿠폰 저장하기</button>
+                    <button id="home-from-coupon-btn" class="btn-secondary">🏠 홈으로</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 실패 애니메이션 -->
+    <div id="fail-animation" class="fail-overlay" style="display: none;">
+        <img src="assets/ggg.png" alt="실패" class="fail-image">
+    </div>
+
+    <!-- 성공 축포 효과 -->
+    <div id="success-celebration" class="success-celebration">
+        <div class="fireworks-container">
+            <div class="firework"></div>
+            <div class="firework"></div>
+            <div class="firework"></div>
+            <div class="firework"></div>
+            <div class="firework"></div>
+            <div class="firework"></div>
+        </div>
+    </div>
+
+    <!-- Success 텍스트 -->
+    <div id="success-text" class="success-text">SUCCESS!</div>
+
+    <!-- Success 이미지 -->
+    <div id="success-image" class="success-image">🏆</div>
+
+    <!-- 하단 로고 -->
+    <div class="footer">
+        <p>견체공학 강아지 음성 공학 연구소</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
